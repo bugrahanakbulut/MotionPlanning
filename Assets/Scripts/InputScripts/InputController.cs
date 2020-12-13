@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Helpers;
 using UnityEngine;
 
 public enum EInputState
@@ -13,6 +14,8 @@ public enum EInputState
 
 public class InputController : MonoBehaviour
 {
+    [SerializeField] private Visualizer _visualizer;
+    
     public EInputState EInputState { get; private set; } = EInputState.CreatingObstacles;
     
     private List<Vector3> _obstacle = new List<Vector3>();
@@ -38,6 +41,14 @@ public class InputController : MonoBehaviour
     private void Update()
     {
         CheckObstacleInput();
+
+        CheckVisualizeInput();
+    }
+
+    private void CheckVisualizeInput()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+            _visualizer.Visualize();
     }
 
     private void CheckObstacleInput()
@@ -47,7 +58,7 @@ public class InputController : MonoBehaviour
             return;
 
         Vector3 mouseWorldPos = _MainCamera.ScreenToWorldPoint(Input.mousePosition);
-        mouseWorldPos.z = 0;
+        mouseWorldPos.z = Constants.Z_DEPTH;
         
         _obstacle.Add(mouseWorldPos);
 

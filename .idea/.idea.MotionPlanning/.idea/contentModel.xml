@@ -6,7 +6,40 @@
     <e p="C:\Users\akbul\Desktop\workspace\Unity\MotionPlanning" t="IncludeRecursive">
       <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
       <e p="Assets" t="Include">
+        <e p="Scenes" t="Include">
+          <e p="VoronoiDemo.cs" t="Include" />
+        </e>
         <e p="Scripts" t="Include">
+          <e p="ExternalLib" t="Include">
+            <e p="Delaunay" t="Include">
+              <e p="DelaunayHelpers.cs" t="Include" />
+              <e p="Edge.cs" t="Include" />
+              <e p="EdgeList.cs" t="Include" />
+              <e p="EdgeReorderer.cs" t="Include" />
+              <e p="Halfedge.cs" t="Include" />
+              <e p="HalfedgePriorityQueue.cs" t="Include" />
+              <e p="ICoord.cs" t="Include" />
+              <e p="LR.cs" t="Include" />
+              <e p="Site.cs" t="Include" />
+              <e p="SiteList.cs" t="Include" />
+              <e p="Triangle.cs" t="Include" />
+              <e p="Vertex.cs" t="Include" />
+              <e p="Voronoi.cs" t="Include" />
+            </e>
+            <e p="geom" t="Include">
+              <e p="Circle.cs" t="Include" />
+              <e p="LineSegment.cs" t="Include" />
+              <e p="Polygon.cs" t="Include" />
+              <e p="Winding.cs" t="Include" />
+            </e>
+            <e p="Utilities" t="Include">
+              <e p="IDisposable.cs" t="Include" />
+            </e>
+          </e>
+          <e p="Helpers" t="Include">
+            <e p="Constants.cs" t="Include" />
+            <e p="Visualizer.cs" t="Include" />
+          </e>
           <e p="InputScripts" t="Include">
             <e p="InputController.cs" t="Include" />
           </e>
