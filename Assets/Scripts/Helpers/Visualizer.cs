@@ -8,8 +8,10 @@ namespace Helpers
 {
     public class Visualizer : MonoBehaviour
     {
-        [SerializeField] private LineFactory _lineFactory = null;
+        [SerializeField] private ObstacleController _obstacleController = null;
 
+        [SerializeField] private LineFactory _lineFactory = null;
+        
         private List<Vector2> _siteCoords = new List<Vector2>();
 
         private Camera _mainCamera;
@@ -26,12 +28,13 @@ namespace Helpers
         
         public void Visualize()
         {
+            
             AddScreenCornersIntoSiteCoords();
             
-            foreach (Line line in _lineFactory.InputLines)
+            foreach (Line obstacle in _obstacleController.Obstacles)
             {
-                _siteCoords.Add(line.StartingPoint);
-                _siteCoords.Add(line.EndPoint);
+                _siteCoords.Add((Vector3)obstacle.LineSegment.p0);
+                _siteCoords.Add((Vector3)obstacle.LineSegment.p1);
             }
             
             Delaunay.Voronoi v = new Delaunay.Voronoi (_siteCoords, null, 
@@ -43,9 +46,8 @@ namespace Helpers
             List<LineSegment> m_delaunayTriangulation = v.DelaunayTriangulation ();
 
             foreach (LineSegment segment in m_delaunayTriangulation)
-            {
-                _lineFactory.CreateLine((Vector2)segment.p0,(Vector2) segment.p1);
-            }
+                _lineFactory.CreateLine(new LineCreationData((Vector2)segment.p0, (Vector2) segment.p1, Color.cyan));
+            
         }
 
         private void AddScreenCornersIntoSiteCoords()

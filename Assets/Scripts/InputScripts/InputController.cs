@@ -18,7 +18,7 @@ public class InputController : MonoBehaviour
     
     public EInputState EInputState { get; private set; } = EInputState.CreatingObstacles;
     
-    private List<Vector3> _obstacle = new List<Vector3>();
+    private List<Vector3> _obstaclePointBuffer = new List<Vector3>();
 
     private IEnumerator _updateEndPointRoutine;
 
@@ -56,26 +56,39 @@ public class InputController : MonoBehaviour
         if (!Input.GetMouseButtonDown(0) ||
             EInputState != EInputState.CreatingObstacles)
             return;
+        
+        if (!CheckPositionInScreen(Input.mousePosition))
+            return;
 
         Vector3 mouseWorldPos = _MainCamera.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPos.z = Constants.Z_DEPTH;
         
-        _obstacle.Add(mouseWorldPos);
+        _obstaclePointBuffer.Add(mouseWorldPos);
 
-        if (_obstacle.Count == 2)
+        if (_obstaclePointBuffer.Count == 2)
         {
-            OnObstacleCreated?.Invoke(_obstacle[0], _obstacle[1]);
+            OnObstacleCreated?.Invoke(_obstaclePointBuffer[0], _obstaclePointBuffer[1]);
             
-            _obstacle.Clear();
+            _obstaclePointBuffer.Clear();
 
             StopUpdateEndPointRoutine();
         }
-        else if (_obstacle.Count == 1)
+        else if (_obstaclePointBuffer.Count == 1)
         {
-            OnCreatedObstacleStartingPoint?.Invoke(_obstacle[0]);
+            OnCreatedObstacleStartingPoint?.Invoke(_obstaclePointBuffer[0]);
             
             StartUpdateEndPointRoutine();
         }
+    }
+
+    private bool CheckPositionInScreen(Vector2 position)
+    {
+        if (position.x > Screen.width || position.x < 0)
+            return false;
+        if (position.y > Screen.height || position.y < 0)
+            return false;
+        
+        return true;
     }
 
     private void StartUpdateEndPointRoutine()

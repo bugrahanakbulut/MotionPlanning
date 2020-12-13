@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Delaunay.Geo;
+using UnityEngine;
 
 namespace LineScripts
 {
@@ -6,31 +7,27 @@ namespace LineScripts
     {
         [SerializeField] private LineRenderer _lineRenderer = null;
 
-        public Vector3 StartingPoint { get; private set; }
-        public Vector3 EndPoint { get; private set; }
-        
-        public void ActivateLine(Vector3 startingPoint, Vector3 endPoint)
+        public LineSegment LineSegment { get; private set; }
+
+        public void ActivateLine(LineCreationData lineCreationData)
         {
-            StartingPoint = startingPoint;
-            EndPoint = endPoint;
+            LineSegment = new LineSegment(lineCreationData.StartingPoint, lineCreationData.EndPoint);
             
-            UpdateLine(startingPoint, endPoint);
+            _lineRenderer.SetPosition(0, lineCreationData.StartingPoint);
+            _lineRenderer.SetPosition(1, lineCreationData.EndPoint);
+
+            _lineRenderer.startColor = lineCreationData.LineColor;
+            _lineRenderer.endColor = lineCreationData.LineColor;
+            _lineRenderer.sortingOrder = lineCreationData.OrderInLayer;
+
         }
 
-        public void UpdateLine(Vector3 startingPoint, Vector3 endPoint)
+        public void UpdateLine(LineCreationData lineCreationData)
         {
-            StartingPoint = startingPoint;
-            EndPoint = endPoint;
+            LineSegment = new LineSegment(lineCreationData.StartingPoint, lineCreationData.EndPoint);
             
-            _lineRenderer.SetPosition(0, startingPoint);
-            _lineRenderer.SetPosition(1, endPoint);
-        }
-        
-        public void UpdateLine(Vector3 endPoint)
-        {
-            EndPoint = endPoint;
-            
-            _lineRenderer.SetPosition(1, endPoint);
+            _lineRenderer.SetPosition(0, lineCreationData.StartingPoint);
+            _lineRenderer.SetPosition(1, lineCreationData.EndPoint);
         }
     }
 }

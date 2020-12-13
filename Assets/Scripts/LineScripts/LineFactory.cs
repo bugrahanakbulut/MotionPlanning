@@ -1,55 +1,48 @@
-﻿using System.Collections.Generic;
+﻿using Helpers;
 using UnityEngine;
 
 namespace LineScripts
 {
+    public class LineCreationData
+    {
+        public Vector3 StartingPoint { get; }
+        public Vector3 EndPoint { get; }
+        public Color LineColor { get; }
+        public int OrderInLayer { get; }
+
+        public LineCreationData(Vector3 startingPoint, Vector3 endPoint)
+        {
+            StartingPoint = startingPoint;
+            EndPoint = endPoint;
+            LineColor = Constants.DEFAULT_COLOR;
+        }
+
+        public LineCreationData(Vector3 startingPoint, Vector3 endPoint, Color lineColor)
+        {
+            StartingPoint = startingPoint;
+            EndPoint = endPoint;
+            LineColor = lineColor;
+        }
+
+        public LineCreationData(Vector3 startingPoint, Vector3 endPoint, int orderInLayer)
+        {
+            StartingPoint = startingPoint;
+            EndPoint = endPoint;
+            LineColor = Constants.DEFAULT_COLOR;
+            OrderInLayer = orderInLayer;
+        }
+    }
+    
     public class LineFactory : MonoBehaviour
     {
-        [SerializeField] private InputController _inputController = null;
-
         [SerializeField] private Line _referenceLine = null;
-
-        public List<Line> InputLines { get; private set; } = new List<Line>();
         
-        private Line _creatingLine = null;
-        
-        private void Awake()
-        {
-            _inputController.OnCreatedObstacleStartingPoint += OnCreatedObstacleStartingPoint;
-            _inputController.OnObstacleEndPointUpdated += OnEndPointUpdated;
-            _inputController.OnObstacleCreated += OnObstacleCreated;
-        }
-
-        private void OnDestroy()
-        {
-            _inputController.OnCreatedObstacleStartingPoint -= OnCreatedObstacleStartingPoint;
-            _inputController.OnObstacleEndPointUpdated -= OnEndPointUpdated;
-            _inputController.OnObstacleCreated -= OnObstacleCreated;
-        }
-
-        private void OnCreatedObstacleStartingPoint(Vector3 startingPoint)
-        {
-            _creatingLine = CreateLine(startingPoint, startingPoint);
-        }
-        
-        private void OnEndPointUpdated(Vector3 endPoint)
-        {
-            _creatingLine.UpdateLine(endPoint);
-        }
-        
-        private void OnObstacleCreated(Vector3 startingPoint, Vector3 endPoint)
-        {
-            _creatingLine.UpdateLine(startingPoint, endPoint);
-            
-            InputLines.Add(_creatingLine);
-        }
-
-        public Line CreateLine(Vector3 startPoint, Vector3 endPoint)
+        public Line CreateLine(LineCreationData creationData)
         {
             Line line = Instantiate(_referenceLine.gameObject, Vector3.zero, Quaternion.identity).GetComponent<Line>();
-            
-            line.ActivateLine(startPoint, endPoint);
 
+            line.ActivateLine(creationData);
+            
             return line;
         }
     }
