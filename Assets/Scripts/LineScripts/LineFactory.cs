@@ -36,10 +36,20 @@ namespace LineScripts
     public class LineFactory : MonoBehaviour
     {
         [SerializeField] private Line _referenceLine = null;
+        [SerializeField] private Line _dashedLine = null;
         
         public Line CreateLine(LineCreationData creationData)
         {
             Line line = Instantiate(_referenceLine.gameObject, Vector3.zero, Quaternion.identity).GetComponent<Line>();
+
+            line.ActivateLine(creationData);
+            
+            return line;
+        }
+        
+        public Line CreateDashedLine(LineCreationData creationData)
+        {
+            Line line = Instantiate(_dashedLine.gameObject, Vector3.zero, Quaternion.identity).GetComponent<Line>();
 
             line.ActivateLine(creationData);
             

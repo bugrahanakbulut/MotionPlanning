@@ -20,16 +20,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5f21fbe7-8ab0-4b14-837e-5e4cb4fa968c" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/LineScripts/ObstacleController.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/LineScripts/ObstacleController.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MotionPlanning/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MotionPlanning/.idea/contentModel.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MotionPlanning/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MotionPlanning/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Helpers/Constants.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Helpers/Constants.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Helpers/Visualizer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Helpers/Visualizer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/InputScripts/InputController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/InputScripts/InputController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/LineScripts/Line.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/LineScripts/Line.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/LineScripts/LineFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/LineScripts/LineFactory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/LineScripts/ObstacleController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/LineScripts/ObstacleController.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,6 +37,7 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/ExternalLib/Utilities/IDisposable.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/LineScripts/DashBehaviour.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scenes/VoronoiDemo.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
@@ -49,10 +46,11 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/TriangulationScripts/Voronoi.cs" />
         <option value="$PROJECT_DIR$/Assets/Scenes/VoronoiDemo.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Utilities/IDisposable.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Helpers/Constants.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InputScripts/InputController.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/LineScripts/Line.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/LineScripts/DashBehaviour.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/LineScripts/LineFactory.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/Helpers/Constants.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/LineScripts/ObstacleController.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Helpers/Visualizer.cs" />
       </list>
@@ -102,7 +100,8 @@
       <workItem from="1607769266163" duration="2105000" />
       <workItem from="1607773414099" duration="996000" />
       <workItem from="1607861170300" duration="5091000" />
-      <workItem from="1607878418837" duration="1795000" />
+      <workItem from="1607878418837" duration="3262000" />
+      <workItem from="1607972614780" duration="2409000" />
     </task>
     <servers />
   </component>
@@ -195,14 +194,14 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state width="1877" height="379" key="GridCell.Tab.3.right/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1607869695386" />
-    <state x="670" y="214" key="RiderGenerateDialog" timestamp="1607880041421">
+    <state x="670" y="214" key="RiderGenerateDialog" timestamp="1607880451618">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="670" y="214" key="RiderGenerateDialog/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1607880041421" />
-    <state x="623" y="227" width="672" height="678" key="search.everywhere.popup" timestamp="1607880128858">
+    <state x="670" y="214" key="RiderGenerateDialog/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1607880451618" />
+    <state x="623" y="227" width="672" height="678" key="search.everywhere.popup" timestamp="1607880485540">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="623" y="227" width="672" height="678" key="search.everywhere.popup/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1607880128858" />
+    <state x="623" y="227" width="672" height="678" key="search.everywhere.popup/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1607880485540" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

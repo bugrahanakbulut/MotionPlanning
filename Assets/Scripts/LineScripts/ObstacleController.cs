@@ -29,17 +29,17 @@ namespace LineScripts
 
         private void OnCreatedObstacleStartingPoint(Vector3 startingPoint)
         {
-            _curLine = _lineFactory.CreateLine(new LineCreationData(startingPoint, startingPoint, 50));
+            _curLine = _lineFactory.CreateLine(new LineCreationData(startingPoint, startingPoint, 0));
         }
 
         private void OnObstacleEndPointUpdated(Vector3 endPoint)
         {
-            _curLine.UpdateLine(new LineCreationData((Vector3)_curLine.LineSegment.p0, endPoint, 50));
+            _curLine.UpdateLine(new LineCreationData((Vector3)_curLine.LineSegment.p0, endPoint, 0));
         }
 
         private void OnObstacleCreated(Vector3 startingPoint, Vector3 endPoint)
         {
-            _curLine.UpdateLine(new LineCreationData(startingPoint, endPoint, 50));
+            _curLine.UpdateLine(new LineCreationData(startingPoint, endPoint, 0));
             
             Obstacles.Add(_curLine);
 

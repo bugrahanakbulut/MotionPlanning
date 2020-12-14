@@ -46,7 +46,7 @@ namespace Helpers
             List<LineSegment> m_delaunayTriangulation = v.DelaunayTriangulation ();
 
             foreach (LineSegment segment in m_delaunayTriangulation)
-                _lineFactory.CreateLine(new LineCreationData((Vector2)segment.p0, (Vector2) segment.p1, Color.cyan));
+                _lineFactory.CreateDashedLine(new LineCreationData((Vector2)segment.p0, (Vector2) segment.p1, Color.cyan));
             
         }
 

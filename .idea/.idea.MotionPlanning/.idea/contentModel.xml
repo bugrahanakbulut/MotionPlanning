@@ -44,6 +44,7 @@
             <e p="InputController.cs" t="Include" />
           </e>
           <e p="LineScripts" t="Include">
+            <e p="DashBehaviour.cs" t="Include" />
             <e p="Line.cs" t="Include" />
             <e p="LineFactory.cs" t="Include" />
             <e p="ObstacleController.cs" t="Include" />
