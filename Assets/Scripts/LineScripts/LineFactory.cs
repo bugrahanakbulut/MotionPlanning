@@ -31,6 +31,14 @@ namespace LineScripts
             LineColor = Constants.DEFAULT_COLOR;
             OrderInLayer = orderInLayer;
         }
+        
+        public LineCreationData(Vector3 startingPoint, Vector3 endPoint, Color lineColor, int orderInLayer)
+        {
+            StartingPoint = startingPoint;
+            EndPoint = endPoint;
+            LineColor = lineColor;
+            OrderInLayer = orderInLayer;
+        }
     }
     
     public class LineFactory : MonoBehaviour

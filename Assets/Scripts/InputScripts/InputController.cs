@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Helpers;
+using RoadPointScripts;
 using UnityEngine;
 
 public enum EInputState
@@ -15,7 +16,10 @@ public enum EInputState
 public class InputController : MonoBehaviour
 {
     [SerializeField] private Visualizer _visualizer;
-    
+
+    [SerializeField] private TriangulationController _triangulationController = null;
+
+    [SerializeField] private RoadPointController _roadPointController = null;
     public EInputState EInputState { get; private set; } = EInputState.CreatingObstacles;
     
     private List<Vector3> _obstaclePointBuffer = new List<Vector3>();
@@ -33,22 +37,55 @@ public class InputController : MonoBehaviour
             return _mainCamera;
         }
     }
-    
+
+    private int _roadPointCount;
+
     public Action<Vector3> OnCreatedObstacleStartingPoint { get; set; }
     public Action<Vector3> OnObstacleEndPointUpdated { get; set; }
     public Action<Vector3, Vector3> OnObstacleCreated { get; set; }
     
     private void Update()
     {
+        CheckUpdateStateInput();
+        
         CheckObstacleInput();
 
-        CheckVisualizeInput();
+        CheckStartFinishInput();
     }
 
-    private void CheckVisualizeInput()
+    private void CheckUpdateStateInput()
     {
         if (Input.GetKeyDown(KeyCode.Space))
-            _visualizer.Visualize();
+        {
+            if (EInputState == EInputState.CreatingObstacles)
+                EInputState = EInputState.CreatingStartFinishPosition;
+        }
+    }
+
+    private void CheckStartFinishInput()
+    {
+        if (!Input.GetMouseButtonDown(0) ||
+            EInputState != EInputState.CreatingStartFinishPosition)
+            return;
+        
+        if (!CheckPositionInScreen(Input.mousePosition))
+            return;
+        
+        Vector3 mouseWorldPos = _MainCamera.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorldPos.z = Constants.Z_DEPTH;
+        
+        _roadPointController.CreateRoadPoint(mouseWorldPos, _roadPointCount == 0);
+
+        _roadPointCount++;
+
+        if (_roadPointCount == 2)
+        {
+            EInputState = EInputState.CreatingOutput;
+
+            _triangulationController.Triangulate();
+            
+            _roadPointController.InitRoadGraph();
+        }
     }
 
     private void CheckObstacleInput()

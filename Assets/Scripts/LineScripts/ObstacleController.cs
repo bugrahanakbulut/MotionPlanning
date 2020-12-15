@@ -30,6 +30,8 @@ namespace LineScripts
         private void OnCreatedObstacleStartingPoint(Vector3 startingPoint)
         {
             _curLine = _lineFactory.CreateLine(new LineCreationData(startingPoint, startingPoint, 0));
+
+            _curLine.IsObstacle = true;
         }
 
         private void OnObstacleEndPointUpdated(Vector3 endPoint)

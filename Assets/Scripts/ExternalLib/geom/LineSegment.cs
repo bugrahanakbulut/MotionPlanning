@@ -33,7 +33,17 @@ namespace Delaunay
 				this.p0 = p0;
 				this.p1 = p1;
 			}
-		
+
+			public override bool Equals(object obj)
+			{
+				LineSegment lineSegment = (LineSegment) obj;
+
+				if ((p0 == lineSegment.p0 || p0 == lineSegment.p1) &&
+				    (p1 == lineSegment.p0 || p1 == lineSegment.p1))
+					return true;
+
+				return false;
+			}
 		}
 	}
 }

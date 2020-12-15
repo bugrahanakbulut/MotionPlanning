@@ -8,6 +8,8 @@ namespace LineScripts
         [SerializeField] private LineRenderer _lineRenderer = null;
 
         public LineSegment LineSegment { get; private set; }
+        
+        public bool IsObstacle { get; set; }
 
         public void ActivateLine(LineCreationData lineCreationData)
         {
