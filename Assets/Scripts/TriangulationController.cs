@@ -181,6 +181,8 @@ public class TriangulationController : MonoBehaviour
         List<Vector2[]> triangles = FindAllTrianglesInAdjacencyGraph(adjacencyGraph);
 
         Triangles = EliminateInvalidTriangles(triangles, allLines);
+        
+        Debug.Log(Triangles.Count);
     }
 
     private Dictionary<Vector2, List<Vector2>> GetAdjacencyGraph(List<Line> lines)
@@ -195,12 +197,12 @@ public class TriangulationController : MonoBehaviour
             if (adjacencyGraph.ContainsKey(s))
                 adjacencyGraph[s].Add(f);
             else
-                adjacencyGraph.Add(s, new List<Vector2>() {f});
+                adjacencyGraph.Add(s, new List<Vector2>() { f });
 
             if (adjacencyGraph.ContainsKey(f))
                 adjacencyGraph[f].Add(s);
             else
-                adjacencyGraph.Add(f, new List<Vector2>() {s});
+                adjacencyGraph.Add(f, new List<Vector2>() { s });
         }
 
         return adjacencyGraph;
