@@ -30,8 +30,31 @@ namespace Delaunay
 		
 			public LineSegment (Nullable<Vector2> p0, Nullable<Vector2> p1)
 			{
-				this.p0 = p0;
-				this.p1 = p1;
+				if (((Vector2) p0).x < ((Vector2) p1).x)
+				{
+					this.p0 = p0;
+					this.p1 = p1;
+				}
+				else if (((Vector2) p0).x > ((Vector2) p1).x)
+				{
+					this.p0 = p1;
+					this.p1 = p0;
+				}
+				else if (((Vector2) p0).y > ((Vector2) p1).y)
+				{
+					this.p0 = p1;
+					this.p1 = p0;
+				}
+				else if (((Vector2) p0).y < ((Vector2) p1).y)
+				{
+					this.p0 = p0;
+					this.p1 = p1;
+				}
+				else
+				{
+					this.p0 = p0;
+					this.p1 = p1;
+				}
 			}
 
 			public override bool Equals(object obj)

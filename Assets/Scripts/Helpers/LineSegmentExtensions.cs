@@ -17,26 +17,19 @@ namespace Helpers
                 (Vector2) lineSegment.p0, (Vector2) lineSegment.p1,
                 (Vector2) other.p0, (Vector2) other.p1);
         }
-        
-        public static bool IsInLeft(this LineSegment lineSegment, Vector2 point)
+
+        private static bool CheckIntersection(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
         {
-            Vector2 a = (Vector2)lineSegment.p0;
-            Vector2 b = (Vector2)lineSegment.p1;
+            float denominator = ((b.x - a.x) * (d.y - c.y)) - ((b.y - a.y) * (d.x - c.x));
+            float numerator1 = ((a.y - c.y) * (d.x - c.x)) - ((a.x - c.x) * (d.y - c.y));
+            float numerator2 = ((a.y - c.y) * (b.x - a.x)) - ((a.x - c.x) * (b.y - a.y));
+            
+            if (denominator == 0) return numerator1 == 0 && numerator2 == 0;
 
-            float area = ((b[0] - a[0]) * (point[1] - a[1])) - ((b[1] - a[1]) * (point[0] - a[0]));
+            float r = numerator1 / denominator;
+            float s = numerator2 / denominator;
 
-            return area > 0;
+            return (r >= 0 && r <= 1) && (s >= 0 && s <= 1);
         }
-
-        private static bool CheckIntersection(Vector2 lineOneA, Vector2 lineOneB, Vector2 lineTwoA, Vector2 lineTwoB)
-        {
-            return 
-                 (lineTwoB.y - lineOneA.y) * (lineTwoA.x - lineOneA.x) > (lineTwoA.y - lineOneA.y) * (lineTwoB.x - lineOneA.x) != 
-                 (lineTwoB.y - lineOneB.y) * (lineTwoA.x - lineOneB.x) > (lineTwoA.y - lineOneB.y) * (lineTwoB.x - lineOneB.x) && 
-                 (lineTwoA.y - lineOneA.y) * (lineOneB.x - lineOneA.x) > (lineOneB.y - lineOneA.y) * (lineTwoA.x - lineOneA.x) != 
-                 (lineTwoB.y - lineOneA.y) * (lineOneB.x - lineOneA.x) > (lineOneB.y - lineOneA.y) * (lineTwoB.x - lineOneA.x);
-        }
-
-        
     }
 }

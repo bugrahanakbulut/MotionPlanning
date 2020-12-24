@@ -54,10 +54,11 @@
             <e p="ObstacleController.cs" t="Include" />
           </e>
           <e p="RoadPointScripts" t="Include">
+            <e p="PathController.cs" t="Include" />
             <e p="RoadPoint.cs" t="Include" />
-            <e p="RoadPointController.cs" t="Include" />
           </e>
           <e p="TriangulationController.cs" t="Include" />
+          <e p="VertexVisualizer.cs" t="Include" />
         </e>
         <e p="TextMesh Pro" t="Include">
           <e p="Fonts" t="Include">

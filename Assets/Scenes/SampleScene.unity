@@ -167,7 +167,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _visualizer: {fileID: 44207022}
   _triangulationController: {fileID: 1269711565}
-  _roadPointController: {fileID: 738608726}
+  pathController: {fileID: 738608726}
 --- !u!114 &44207022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,7 +274,7 @@ GameObject:
   - component: {fileID: 738608727}
   - component: {fileID: 738608726}
   m_Layer: 0
-  m_Name: RoadPointController
+  m_Name: PathController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -342,6 +342,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _obstacleController: {fileID: 1648330530}
   _lineFactory: {fileID: 1929685480}
+  _referenceVisualizer: {fileID: -104258924071388948, guid: 70ee509f3b27b0245a91a65cf2a8bf9b,
+    type: 3}
+  TriangulationLines: []
 --- !u!4 &1269711566
 Transform:
   m_ObjectHideFlags: 0

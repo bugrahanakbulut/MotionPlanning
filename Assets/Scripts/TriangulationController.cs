@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using Delaunay;
 using Delaunay.Geo;
 using Helpers;
-using JetBrains.Annotations;
 using LineScripts;
 using UnityEngine;
 using Vector2 = UnityEngine.Vector2;
@@ -16,12 +14,16 @@ public class TriangulationController : MonoBehaviour
 
     [SerializeField] private LineFactory _lineFactory = null;
 
+    [SerializeField] private VertexVisualizer _referenceVisualizer = null;
+    
     public List<Line> TriangulationLines = new List<Line>();
 
     public List<Vector2[]> Triangles = new List<Vector2[]>();
 
     private List<Vector2> _siteCoords = new List<Vector2>();
 
+    private List<VertexVisualizer> _vertexVisualizers = new List<VertexVisualizer>();
+    
     private Camera _mainCamera;
 
     private Camera _MainCamera
@@ -34,7 +36,6 @@ public class TriangulationController : MonoBehaviour
             return _mainCamera;
         }
     }
-
     public void Triangulate()
     {
         AddScreenCornersIntoSiteCoords();
@@ -47,25 +48,58 @@ public class TriangulationController : MonoBehaviour
 
         Voronoi v = new Voronoi(_siteCoords, null, new Rect(0, 0, 0, 0));
 
+        // complexity : n * log(n)
         List<LineSegment> delaunayTriangulation = v.DelaunayTriangulation();
 
+        // complexity : n * v
         Dictionary<Line, List<LineSegment>> intersections =
             CheckTriangulationIntersectionWithObstacles(delaunayTriangulation, _obstacleController.Obstacles);
 
-        delaunayTriangulation = RemoveInterSectionsAndUpdateTriangulation(intersections, delaunayTriangulation);
+        // complexity : n * n * log(n)
+        delaunayTriangulation = UpdateTriangulationByAddingObstacles(intersections, delaunayTriangulation);
 
-        foreach (Line obstacle in _obstacleController.Obstacles)
-            delaunayTriangulation.Remove(obstacle.LineSegment);
-        
         foreach (LineSegment lineSegment in delaunayTriangulation)
         {
             Line line = _lineFactory.CreateDashedLine(new LineCreationData((Vector2) lineSegment.p0,
                 (Vector2) lineSegment.p1,
-                Color.cyan));
+                Color.yellow, 1));
 
             TriangulationLines.Add(line);
         }
+
+        int vertIndex = 0;
         
+        foreach (Line line in TriangulationLines)
+        {
+            bool p0 = false, p1 = false;
+
+            foreach (VertexVisualizer visualizer in _vertexVisualizers)
+            {
+                if (visualizer.transform.position == line.LineSegment.p0)
+                    p0 = true;
+                
+                if (visualizer.transform.position == line.LineSegment.p1)
+                    p1= true;
+            }
+
+            if (!p0)
+            {
+                GameObject g = Instantiate(_referenceVisualizer.gameObject, (Vector2)line.LineSegment.p0, Quaternion.identity);
+                VertexVisualizer vv = g.GetComponent<VertexVisualizer>();
+                vv.Init((Vector2) line.LineSegment.p0, vertIndex++);
+                _vertexVisualizers.Add(vv);
+            }
+
+            if (!p1)
+            {
+                GameObject g = Instantiate(_referenceVisualizer.gameObject, (Vector2)line.LineSegment.p0, Quaternion.identity);
+                VertexVisualizer vv = g.GetComponent<VertexVisualizer>();
+                vv.Init((Vector2) line.LineSegment.p1, vertIndex++);
+                _vertexVisualizers.Add(vv);
+            }
+        }
+        
+        // complexity : n * n * n
         InitTriangles();
     }
 
@@ -93,7 +127,7 @@ public class TriangulationController : MonoBehaviour
         List<LineSegment> delaunayTriangulation, List<Line> obstacles)
     {
         Dictionary<Line, List<LineSegment>> intersectDict = new Dictionary<Line, List<LineSegment>>();
-
+        
         foreach (Line obstacle in obstacles)
         {
             intersectDict.Add(obstacle, new List<LineSegment>());
@@ -108,65 +142,177 @@ public class TriangulationController : MonoBehaviour
         return intersectDict;
     }
 
-    private List<LineSegment> RemoveInterSectionsAndUpdateTriangulation(
-        Dictionary<Line, List<LineSegment>> intersections, List<LineSegment> delaunay)
+    private List<LineSegment> UpdateTriangulationByAddingObstacles(
+        Dictionary<Line, List<LineSegment>> intersections,
+        List<LineSegment> delaunay)
     {
-        foreach (KeyValuePair<Line, List<LineSegment>> keyValuePair in intersections)
+        List<Line> triangulatedObstacles = new List<Line>();
+
+        foreach (Line obstacle in intersections.Keys)
         {
-            List<Vector2> leftSites = new List<Vector2>()
+            if (triangulatedObstacles.Contains(obstacle)) continue;
+            
+            List<Line> allIntersectedObstacles = new List<Line>() { obstacle };
+            
+            List<LineSegment> allIntersectedLineSegments = new List<LineSegment>(intersections[obstacle]);
+
+            foreach (KeyValuePair<Line,List<LineSegment>> intersection in intersections)
             {
-                (Vector2) keyValuePair.Key.LineSegment.p0,
-                (Vector2) keyValuePair.Key.LineSegment.p1
-            };
+                if (intersection.Key == obstacle) continue;
+                
+                if (triangulatedObstacles.Contains(obstacle)) continue;
 
-            List<Vector2> rightSites = new List<Vector2>()
+                IEnumerable<LineSegment> commonLineSegment = intersections[obstacle].Intersect(intersection.Value);
+
+                if (commonLineSegment.Any())
+                {
+                    foreach (LineSegment lineSegment in intersection.Value)
+                    {
+                        if (!allIntersectedLineSegments.Contains(lineSegment))
+                            allIntersectedLineSegments.Add(lineSegment);
+                    }
+                    
+                    allIntersectedObstacles.Add(intersection.Key);
+                
+                    triangulatedObstacles.AddRange(allIntersectedObstacles);
+                }
+            }
+            
+            foreach (LineSegment segment in allIntersectedLineSegments)
+                delaunay.RemoveAll(i 
+                    => ( i.p0 == segment.p0 || i.p0 == segment.p1 ) &&
+                       ( i.p1 == segment.p0 || i.p1 == segment.p1 ));
+
+            List<LineSegment> candidates =
+                ConstructTriangulationWithObstaclesAndSegments(allIntersectedObstacles, allIntersectedLineSegments);
+
+            foreach (LineSegment candidate in candidates)
             {
-                (Vector2) keyValuePair.Key.LineSegment.p0,
-                (Vector2) keyValuePair.Key.LineSegment.p1
-            };
+                bool isIntersected = false;
+                
+                foreach (LineSegment lineSegment in delaunay)
+                {
+                    if (candidate.IsIntersectingWith(lineSegment))
+                    {
+                        isIntersected = true;
+                        
+                        break;
+                    }
+                }
 
-            foreach (LineSegment lineSegment in keyValuePair.Value)
-            {
-                if (delaunay.Contains(lineSegment))
-                    delaunay.Remove(lineSegment);
-
-                if (keyValuePair.Key.LineSegment.IsInLeft((Vector2) lineSegment.p0))
-                    leftSites.Add((Vector2) lineSegment.p0);
-                else
-                    rightSites.Add((Vector2) lineSegment.p0);
-
-                if (keyValuePair.Key.LineSegment.IsInLeft((Vector2) lineSegment.p1))
-                    leftSites.Add((Vector2) lineSegment.p1);
-                else
-                    rightSites.Add((Vector2) lineSegment.p1);
+                if (!isIntersected)
+                {
+                    foreach (Line obstacleLine in _obstacleController.Obstacles)
+                    {
+                        if (candidate.IsIntersectingWith(obstacleLine.LineSegment))
+                        {
+                            isIntersected = true;
+                            
+                            break;
+                        }
+                    }
+                }
+                
+                if (!isIntersected)
+                    delaunay.Add(candidate);
             }
 
-            List<LineSegment> leftTriangulation = TriangulateFromSiteList(leftSites);
-            List<LineSegment> rightTriangulation = TriangulateFromSiteList(rightSites);
-
-            leftTriangulation.AddRange(rightTriangulation);
-
-            foreach (LineSegment segment in leftTriangulation)
-            {
-                if (!delaunay.Contains(segment))
-                    delaunay.Add(segment);
-            }
-
+            foreach (LineSegment lineSegment in allIntersectedLineSegments)
+                delaunay.Remove(lineSegment);
         }
 
         return delaunay;
     }
 
-    private List<LineSegment> TriangulateFromSiteList(List<Vector2> sites)
+    private List<LineSegment> ConstructTriangulationWithObstaclesAndSegments(List<Line> obstacles, List<LineSegment> lineSegments)
     {
-        Vector3 leftBot = _MainCamera.ScreenToWorldPoint(Vector2.zero);
-        leftBot.z = Constants.Z_DEPTH;
+        // 1. order obstacles by left to right
+        // 2. categorize points by segments (p1 in between o1 - o2 etc.)
+        // 3. triangulate each segment by itself
 
-        Vector3 rightUp = _MainCamera.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
-        rightUp.z = Constants.Z_DEPTH;
+        obstacles.Sort();
 
-        Voronoi v = new Voronoi(sites, null,
-            new Rect(leftBot.x, leftBot.y, rightUp.x, rightUp.y));
+        List<Vector2> allVertices =  new List<Vector2>();
+
+        foreach (LineSegment lineSegment in lineSegments)
+        {
+            if (!allVertices.Contains((Vector2) lineSegment.p0))
+                allVertices.Add((Vector2) lineSegment.p0);
+            
+            if (!allVertices.Contains((Vector2) lineSegment.p1))
+                allVertices.Add((Vector2) lineSegment.p1);
+        }
+        
+        // triangulate leftmost and rightmost segments first
+
+        List<Vector2> leftMostSegment = new List<Vector2>()
+        {
+            (Vector2) obstacles[0].LineSegment.p0,
+            (Vector2) obstacles[0].LineSegment.p1
+        };
+
+
+        List<Vector2> rightMostSegment = new List<Vector2>()
+        {
+            (Vector2) obstacles[obstacles.Count - 1].LineSegment.p0,
+            (Vector2) obstacles[obstacles.Count - 1].LineSegment.p1
+        };
+        
+        foreach (Vector2 vertex in allVertices)
+        {
+            if (obstacles[0].IsInLeft(vertex) && !leftMostSegment.Contains(vertex))
+                leftMostSegment.Add(vertex);
+            
+            if (!obstacles[obstacles.Count - 1].IsInLeft(vertex) && !rightMostSegment.Contains(vertex))
+                rightMostSegment.Add(vertex);
+        }
+        
+        List<LineSegment> newTriangulationLineSegments = new List<LineSegment>();
+        
+        foreach (LineSegment segment in TriangulateVertices(leftMostSegment))
+        {
+            if (!newTriangulationLineSegments.Contains(segment))
+                newTriangulationLineSegments.Add(segment);
+        }
+
+        foreach (LineSegment segment in TriangulateVertices(rightMostSegment))
+        {
+            if (!newTriangulationLineSegments.Contains(segment))
+                newTriangulationLineSegments.Add(segment);
+        }
+        
+
+        for (int i = 0; i < obstacles.Count - 1; i++)
+        {
+            List<Vector2> curSegmentVertices = new List<Vector2>();
+            
+            curSegmentVertices.Add((Vector2) obstacles[i].LineSegment.p0);
+            curSegmentVertices.Add((Vector2) obstacles[i].LineSegment.p1);
+            curSegmentVertices.Add((Vector2) obstacles[i + 1].LineSegment.p0);
+            curSegmentVertices.Add((Vector2) obstacles[i + 1].LineSegment.p1);
+            
+            foreach (Vector2 vertex in allVertices)
+            {
+                if (!obstacles[i].IsInLeft(vertex) && obstacles[i + 1].IsInLeft(vertex))
+                {
+                    if (!curSegmentVertices.Contains(vertex))
+                        curSegmentVertices.Add(vertex);
+                }
+            }
+            
+            foreach (LineSegment segment in TriangulateVertices(curSegmentVertices))
+            {
+                if (!newTriangulationLineSegments.Contains(segment))
+                    newTriangulationLineSegments.Add(segment);
+            }
+        }
+
+        return newTriangulationLineSegments;
+    }
+
+    private List<LineSegment> TriangulateVertices(List<Vector2> vertices)
+    {
+        Voronoi v = new Voronoi(vertices, null, Rect.zero);
 
         return v.DelaunayTriangulation();
     }
@@ -175,14 +321,15 @@ public class TriangulationController : MonoBehaviour
     {
         List<Line> allLines = new List<Line>(TriangulationLines);
         allLines.AddRange(_obstacleController.Obstacles);
-
+        
+        // complexity : n
         Dictionary<Vector2, List<Vector2>> adjacencyGraph = GetAdjacencyGraph(allLines);
 
+        // complexity : n * n * n
         List<Vector2[]> triangles = FindAllTrianglesInAdjacencyGraph(adjacencyGraph);
 
+        // complexity : n * n
         Triangles = EliminateInvalidTriangles(triangles, allLines);
-        
-        Debug.Log(Triangles.Count);
     }
 
     private Dictionary<Vector2, List<Vector2>> GetAdjacencyGraph(List<Line> lines)
@@ -222,27 +369,27 @@ public class TriangulationController : MonoBehaviour
 
                 foreach (Vector2 commonVertex in commons)
                 {
-                    bool canAdd = true;
-
                     Vector2[] tri = new []{ kvp.Key, adjNode, commonVertex };
                     
-                    foreach (Vector2[] triangle in triangles)
-                    {
-                        IEnumerable<Vector2> commPoints = triangle.Intersect(tri);
-
-                        canAdd = canAdd && (commPoints.Count() != 3);
-                    }
-
-                    if (canAdd)
-                        triangles.Add(tri);
+                    triangles.Add(tri);
                 }
             }
         }
 
-        return triangles;
+        List<Vector2[]> uniqueTriangles = new List<Vector2[]>(triangles);
+
+        for (int i = 0; i < triangles.Count; i++)
+        {
+            for (int j = i + 1; j < uniqueTriangles.Count; j++)
+            {
+                if (triangles[i].Intersect(uniqueTriangles[j]).Count() == 3)
+                    uniqueTriangles.RemoveAt(j);
+            }
+        }
+        
+        return uniqueTriangles;
     }
 
-    [ItemCanBeNull]
     private List<Vector2[]> EliminateInvalidTriangles(List<Vector2[]> triangles, List<Line> allLines)
     {
         List<Vector2> allVertices = new List<Vector2>();

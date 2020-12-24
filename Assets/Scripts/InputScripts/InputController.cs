@@ -10,7 +10,9 @@ public enum EInputState
     None = 0,
     CreatingObstacles = 1,
     CreatingStartFinishPosition = 2,
-    CreatingOutput = 3
+    Triangulate = 3,
+    InitRoadGraph = 4,
+    FindShortestPath = 5
 }
 
 public class InputController : MonoBehaviour
@@ -19,7 +21,7 @@ public class InputController : MonoBehaviour
 
     [SerializeField] private TriangulationController _triangulationController = null;
 
-    [SerializeField] private RoadPointController _roadPointController = null;
+    [SerializeField] private PathController pathController = null;
     public EInputState EInputState { get; private set; } = EInputState.CreatingObstacles;
     
     private List<Vector3> _obstaclePointBuffer = new List<Vector3>();
@@ -58,7 +60,35 @@ public class InputController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (EInputState == EInputState.CreatingObstacles)
+            {
                 EInputState = EInputState.CreatingStartFinishPosition;
+                
+                return;
+            }
+            
+            if (EInputState == EInputState.Triangulate)
+            {
+                _triangulationController.Triangulate();
+
+                EInputState = EInputState.InitRoadGraph;
+                
+                return;
+            }
+            
+            if (EInputState == EInputState.InitRoadGraph)
+            {
+                pathController.InitRoadGraph();
+                
+                EInputState = EInputState.FindShortestPath;
+                
+                return;
+            }
+            
+            if (EInputState == EInputState.FindShortestPath)
+            {
+                pathController.FindWayThrough();
+            }
+            
         }
     }
 
@@ -74,18 +104,12 @@ public class InputController : MonoBehaviour
         Vector3 mouseWorldPos = _MainCamera.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPos.z = Constants.Z_DEPTH;
         
-        _roadPointController.CreateRoadPoint(mouseWorldPos, _roadPointCount == 0);
+        pathController.CreateRoadPoint(mouseWorldPos, _roadPointCount == 0);
 
         _roadPointCount++;
 
         if (_roadPointCount == 2)
-        {
-            EInputState = EInputState.CreatingOutput;
-
-            _triangulationController.Triangulate();
-            
-            _roadPointController.InitRoadGraph();
-        }
+            EInputState = EInputState.Triangulate;
     }
 
     private void CheckObstacleInput()
@@ -147,12 +171,12 @@ public class InputController : MonoBehaviour
     {
         while (true)
         {
+            yield return null;
+            
             Vector3 mouseWorldPos = _MainCamera.ScreenToWorldPoint(Input.mousePosition);
             mouseWorldPos.z = 0;
         
             OnObstacleEndPointUpdated?.Invoke(mouseWorldPos);
-            
-            yield return null;
         }
     }
 }
