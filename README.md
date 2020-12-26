@@ -5,5 +5,6 @@ You can find all implementation details in report.
 
 # Contact & Some Additional Notes
 If you have any questions or comments, please feel free to contact me.
+
 email: akbulutbugrahan[at]gmail.com
 
